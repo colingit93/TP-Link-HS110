@@ -103,11 +103,17 @@ if args.command == 'energy':
 		args.loop = 10
 	for i in range(0, args.loop):
 		try:
+			scriptexectime = time.time()
 			# Encrypt and send data to the TP Link
+			
+			# Measure Time it takes for response
 			sock_tcp = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+			start = time.time()
 			sock_tcp.connect((ip, port))
 			sock_tcp.send(encrypt(cmd))
 			data = sock_tcp.recv(2048)
+			sock_tcp.close()
+			print("HS110 Response Time:", time.time()-start)
 
 			# Decrypt Response and use JSON serializer to convert to valid JSON
 			decrypted_data = decrypt(data[4:])
@@ -131,8 +137,10 @@ if args.command == 'energy':
 			#plt.pause(0.05)
 			#plt.draw()
 
-			sock_tcp.close()
-			time.sleep(1)
+			# Subtract HS110 Response time to compensate and achive exact sleep time
+			time.sleep(1 - (time.time()-start))
+			print("Sleep Time", time.time()-scriptexectime)
+
 		except socket.error:
 			quit("Cound not connect to host " + ip + ":" + str(port))
 else:
