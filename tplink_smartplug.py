@@ -101,6 +101,7 @@ mw_wattage_list = []
 systime_list = []
 sampling_time_seconds = 1
 default_iteration = 10
+response_time_exceeded_samplingrate = 0
 # LOOP if energy command is send
 if args.command == 'energy':
 	if args.loop == None:
@@ -147,7 +148,9 @@ if args.command == 'energy':
 			except ValueError as valerr:
 				print("Sleep Value Error: ", valerr)
 				print("The HS110 took more time to respond than the set iteration time (sampling_time_seconds)")
-				sys.exit(1)
+				response_time_exceeded_samplingrate += 1
+				continue
+			print("Counter - Response Time > Sampling Time:", response_time_exceeded_samplingrate)
 
 		except socket.error:
 			quit("Cound not connect to host " + ip + ":" + str(port))
@@ -172,7 +175,7 @@ else:
 if args.command == 'energy':
 	#WRITE CSV DATA
 	try:
-		df = pandas.DataFrame(data={"Time": systime_list, "CPU Wattage": wattage_list})
+		df = pandas.DataFrame(data={"Time": systime_list, "System Total Wattage": wattage_list})
 		df.to_csv("./loggin_data.csv", sep=';',index=False, mode='w', encoding="utf-8")
 		print(systime_list)
 	except Exception as a:
@@ -180,7 +183,7 @@ if args.command == 'energy':
 		print(a)
 
 	try: 
-		df = pandas.DataFrame(data={"Time": systime_list, "CPU Wattage": wattage_list})
+		df = pandas.DataFrame(data={"Time": systime_list, "System Total Wattage": wattage_list})
 		writer = pandas.ExcelWriter('loggin_data_excel.xlsx', engine='xlsxwriter')
 		df.to_excel(writer, sheet_name='Sheet1')
 		writer.save()
