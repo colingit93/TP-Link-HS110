@@ -22,6 +22,7 @@
 #
 
 import socket, argparse, json, urllib, urllib.request, logging, os, time, datetime, struct, sys, time, csv, pandas
+import xlsxwriter
 import matplotlib.pyplot as plt
 import numpy as np
 from struct import pack
@@ -98,15 +99,19 @@ else:
 wattage_list = []
 mw_wattage_list = []
 systime_list = []
+sampling_time_seconds = 1
+default_iteration = 10
+# LOOP if energy command is send
 if args.command == 'energy':
 	if args.loop == None:
-		args.loop = 10
+		args.loop = default_iteration
 	for i in range(0, args.loop):
 		try:
-			scriptexectime = time.time()
-			# Encrypt and send data to the TP Link
+			iteration_time = time.time()
+			print("\nRunNr:", i, "/",args.loop)
 			
-			# Measure Time it takes for response
+			# Encrypt and send data to the TP Link
+			# Measure Time it takes for HS110 to respond 
 			sock_tcp = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 			start = time.time()
 			sock_tcp.connect((ip, port))
@@ -120,9 +125,7 @@ if args.command == 'energy':
 			json_data = json.loads(decrypted_data)
 			#print("Sent:     ", cmd)
 			#print("Received: ", json_data)
-			print("\nRunNr:", i, "/",args.loop)
 			print("Wattage:", json_data["emeter"]["get_realtime"]["power_mw"]/1000)
-			#print("Time:", datetime.datetime.now().time())
 			print("Time:", datetime.datetime.now().strftime("%H:%M:%S"))
 			
 			# Add values to list
@@ -137,12 +140,18 @@ if args.command == 'energy':
 			#plt.pause(0.05)
 			#plt.draw()
 
-			# Subtract HS110 Response time to compensate and achive exact sleep time
-			time.sleep(1 - (time.time()-start))
-			print("Sleep Time", time.time()-scriptexectime)
+			try:
+				# Subtract HS110 Response time (and some code time) to compensate and achive exact sleep time (resolution)
+				time.sleep(sampling_time_seconds - (time.time()-start))
+				print("Total Iteration Time:", time.time()-iteration_time)
+			except ValueError as valerr:
+				print("Sleep Value Error: ", valerr)
+				print("The HS110 took more time to respond than the set iteration time (sampling_time_seconds)")
+				sys.exit(1)
 
 		except socket.error:
 			quit("Cound not connect to host " + ip + ":" + str(port))
+# Don't Loop for other commands
 else:
 	try:
 		sock_tcp = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -159,17 +168,24 @@ else:
 	except socket.error:
 		quit("Cound not connect to host " + ip + ":" + str(port))
 
-# it is only necessary to plot and write csv if energy was the command
+# Only write CSV if 'energy' was the command
 if args.command == 'energy':
 	#WRITE CSV DATA
-	#print("LIST:", wattage_list)
-	# Write data from list to JSON FILE
 	try:
-		df = pandas.DataFrame(data={"Time": systime_list, "m.W.": mw_wattage_list})
-		df.to_csv("./data.csv", sep=';',index=False, mode='w')
+		df = pandas.DataFrame(data={"Time": systime_list, "CPU Wattage": wattage_list})
+		df.to_csv("./loggin_data.csv", sep=';',index=False, mode='w', encoding="utf-8")
 		print(systime_list)
 	except Exception as a:
 		print("Exception writing CSV File")	
+		print(a)
+
+	try: 
+		df = pandas.DataFrame(data={"Time": systime_list, "CPU Wattage": wattage_list})
+		writer = pandas.ExcelWriter('loggin_data_excel.xlsx', engine='xlsxwriter')
+		df.to_excel(writer, sheet_name='Sheet1')
+		writer.save()
+	except Exception as a:
+		print("Exception writing XLSX File")
 		print(a)
 
 	#PLOTTING
