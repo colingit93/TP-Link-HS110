@@ -11,13 +11,15 @@ This is a fork from softScheck original project: https://github.com/softScheck/t
 
 **Execution:**
 
-python3 ./tplink_smartplug.py -t <ip> [-c <cmd> || -j <json>] -l <number>
+python3 ./tplink_smartplug.py -t <ip> [-c <cmd> || -j <json>] -l <number> [-oc<CSVoutput> -ox<XLSXoutput>]
 
 **Example:** python3 ./tplink_smartplug.py -t 192.168.47.3 -c energy -l 3 
 
 -t: IPv4 address of the TP-Link
 -c: command sent to TP-Link
 -l: number of loops
+-oc: .csv Name (optional)
+-ox: .xlsx Name (optional)
 
 
 
