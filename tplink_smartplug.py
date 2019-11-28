@@ -81,9 +81,15 @@ parser.add_argument("-t", "--target", metavar="<hostname>", help="Target hostnam
 parser.add_argument("-c", "--command", metavar="<command>", help="Preset command to send. Choices are: "+", ".join(commands), choices=commands, required=True)
 parser.add_argument("-j", "--json", metavar="<JSON string>", help="Full JSON string of command to send", required=False)
 parser.add_argument("-l", "--loop", metavar="<loopcount>", type=int, help="Specify how many times you want to execute (Default is 10)", required=False)
+parser.add_argument("-oc", "--csv", metavar="<output>", help="Specify CSV file name", required=False)
+parser.add_argument("-ox", "--xlsx", metavar="<output>", help="Specify XLSX file name", required=False)
 args = parser.parse_args()
 #print("Argument_Loop:", args.loop)
 
+if args.csv == None:
+	args.csv = "measurement_data.csv"
+if args.xlsx == None:
+	args.xlsx = "measurement_data.xlsx"
 
 # Set target IP, port and command to send
 ip = args.target
@@ -109,7 +115,7 @@ if args.command == 'energy':
 	for i in range(0, args.loop):
 		try:
 			iteration_time = time.time()
-			print("\nRunNr:", i, "/",args.loop)
+			print("\nRunNr:", i+1, "/",args.loop)
 			
 			# Encrypt and send data to the TP Link
 			# Measure Time it takes for HS110 to respond 
@@ -176,7 +182,7 @@ if args.command == 'energy':
 	#WRITE CSV DATA
 	try:
 		df = pandas.DataFrame(data={"Time": systime_list, "System Total Wattage": wattage_list})
-		df.to_csv("./loggin_data.csv", sep=';',index=False, mode='w', encoding="utf-8")
+		df.to_csv(args.csv, sep=';',index=False, mode='w', encoding="utf-8")
 		print(systime_list)
 	except Exception as a:
 		print("Exception writing CSV File")	
@@ -184,7 +190,7 @@ if args.command == 'energy':
 
 	try: 
 		df = pandas.DataFrame(data={"Time": systime_list, "System Total Wattage": wattage_list})
-		writer = pandas.ExcelWriter('loggin_data_excel.xlsx', engine='xlsxwriter')
+		writer = pandas.ExcelWriter(args.xlsx, engine='xlsxwriter')
 		df.to_excel(writer, sheet_name='Sheet1')
 		writer.save()
 	except Exception as a:
