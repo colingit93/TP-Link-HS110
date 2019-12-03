@@ -200,9 +200,10 @@ if args.command == 'energy':
 	#PLOTTING
 	#plt.axis([0, 70, 0, 70])
 	#fig.suptitle('test title', fontsize=20)
-	plt.xlabel('Time', fontsize=13)
+	plt.xlabel('Time', fontsize=13, rotation='horizontal')
 	plt.ylabel('Watt', fontsize=13)
-	plt.title('TP-Link HS110')
+	plt.title('TP-Link HS110 - TOTAL SYSTEM WATTAGE')
 	#fig.savefig('plot.jpg')
 	plt.plot(systime_list, wattage_list)
+	plt.xticks(systime_list, systime_list, rotation='horizontal')
 	plt.show()
