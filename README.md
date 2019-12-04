@@ -8,6 +8,12 @@ This is a fork from softScheck original project: https://github.com/softScheck/t
 **Libraries:**
 
 > socket, argparse, json, urllib, urllib.request, logging, os, time, datetime, struct, sys, time, csv, pandas, xlsxwriter, matplotlib.pyplot
+>
+> > pip install XlsxWriter - https://pypi.org/project/XlsxWriter/
+> >
+> > pip install matplotlib - https://pypi.org/project/matplotlib/
+> >
+> > pip install pandas - https://pypi.org/project/pandas/
 
 **Execution:**
 
