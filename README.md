@@ -13,6 +13,8 @@ This is a fork from softScheck original project: https://github.com/softScheck/t
 
 python3 ./tplink_smartplug.py -t <ip> [-c <cmd> || -j <json>] -l <number> [-oc<CSVoutput> -ox<XLSXoutput>]
 
+Further information: python3 ./tplink_smartplug.py -h
+
 **Example:** python3 ./tplink_smartplug.py -t 192.168.47.3 -c energy -l 3 -oc data.csv -ox data.xlsx
 
 -t: IPv4 address of the TP-Link
