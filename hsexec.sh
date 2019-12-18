@@ -1,2 +1,2 @@
-python3 ./tplink_smartplug.py -t 192.168.47.3 -c energy -l 10 &
-python3 ./tplink_smartplug.py -t 192.168.47.3 -c energy -l 10 &
+python3 ./tplink_smartplug.py -t 192.168.47.4 -c energy -l 120 -oc 12_100_1_v3.csv -ox 12_100_1_v3.xlsx &
+python3 ./tplink_smartplug.py -t 192.168.47.1 -c energy -l 120 -oc 22_100_1_v3.csv -ox 22_100_1_v3.xlsx &
